@@ -31,6 +31,24 @@ credentials and calls `done` providing a user.
       }
     ));
 
+##### Avoid login dialog with Basic authentication strategy
+
+Most web browsers will display a login dialog when they receive a `401 Unauthorized` response with the `Basic` challenge. To avoid that login dialog you can pass `xhrChallengeType` option. This will set a different challenge type, then browser will not show login dialog.
+
+```js
+passport.use(new BasicStrategy(
+  { xhrChallengeType: 'customBasic' },
+  function(userid, password, done) {
+    User.findOne({ username: userid }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      if (!user.verifyPassword(password)) { return done(null, false); }
+      return done(null, user);
+    });
+  }
+));
+```
+
 #### Authenticate Requests
 
 Use `passport.authenticate()`, specifying the `'basic'` strategy, to
